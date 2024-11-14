@@ -3,6 +3,12 @@ from pytube import YouTube
 import whisper
 import os
 from fastapi import HTTPException
+import torch
+import warnings
+
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", message="You are using `torch.load` with `weights_only=False`")
+    model = whisper.load_model("base")
 
 
 async def get_video_transcript(url: str, language: str = "mr") -> str:
@@ -18,7 +24,7 @@ async def get_video_transcript(url: str, language: str = "mr") -> str:
             yt = YouTube(url)
             audio_path = yt.streams.filter(only_audio=True).first().download()
             result = model.transcribe(audio_path)
-            os.remove(audio_path)  # Cleaning up a downloaded file (Metro Boomin lol)
+            os.remove(audio_path)  # Cleaning up downloaded audio file
             return result["text"]
         except Exception as whisper_error:
             raise HTTPException(
