@@ -7,11 +7,12 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 import networkx as nx
 from groq import Groq
+import dotenv
+dotenv.load_dotenv(dotenv_path='.env')
 
-# Initialize Groq client (replace with your actual API key)
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-# Class for text processing
+
 class TextProcessor:
     def __init__(self):
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -34,6 +35,7 @@ class TextProcessor:
             embedding=self.embeddings,
             persist_directory="./chroma_db"
         )
+
 
 # Class for building the graph
 class GraphBuilder:
@@ -63,6 +65,7 @@ class GraphBuilder:
         )[:top_k]
         return [self.graph.nodes[node]['text'] for node, _ in important_nodes]
 
+
 # Function to get transcript
 def get_video_transcript(url, language="mr"):
     try:
@@ -77,6 +80,7 @@ def get_video_transcript(url, language="mr"):
         result = model.transcribe(audio_path)
         os.remove(audio_path)
         return result["text"]
+
 
 # Function to generate a summary using Groq
 def generate_summary_with_groq(text, max_length=300):
@@ -105,6 +109,7 @@ def generate_summary_with_groq(text, max_length=300):
     )
 
     return chat_completion.choices[0].message.content
+
 
 if __name__ == "__main__":
     url = input("Enter the YouTube video URL: ")
